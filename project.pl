@@ -236,9 +236,9 @@ lex(n(X^P),Lemma):-
 	P=.. [Stem,X].
 
 % Lex for tv
-lex(tv(X^Y^P), Lemma):-
+lex(tv(X^Y^P,[]), Lemma):-
   lexi(Lemma, Stem),
-	lemma(Stem,tv),
+  lemma(Stem,tv),
   P=.. [Stem, X,Y].
 
 % Lex for iv
@@ -305,6 +305,9 @@ lex(tv(X^Y^have(X,Y)),had).
 lex(X,drank):-lex(X,drink).
 lex(X,drunk):-lex(X,drink).
 
+lex(X,Lemma):-
+	lemma(Lemma,there),
+  X = [].
 % ...
 
 % --------------------------------------------------------------------
@@ -351,6 +354,9 @@ rule(vp(X^Y,[]),[aux(_),vp(X^Y,[])]).
 
 % S -> NP VP
 rule(s(Y),[np(X^Y),vp(X)]).
+% rule(s(Y,WH),[np(X^Y),vp(X,WH)]). % original
+% rule(s(Y), [np(Y),vp(Y)]). %%%%
+% rule(s(X,[WH]),[vp(X,[WH])]).
 
 % Questions
 rule(ynq(Y),[aux, np(X^Y),vp(X,[])]).
