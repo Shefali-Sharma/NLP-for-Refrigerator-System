@@ -214,13 +214,98 @@ lemma(popsicles,n).  %Check
 % word = lemma + suffix (for "suffix" of size 0 or bigger)
 % --------------------------------------------------------------------
 
+removeLast([X|Xa], Y) :-
+  removeLastPrev(Xa, Y, X).
 
+removeLastPrev([], [], _).
+removeLastPrev([X1|Xa], [X2|Y], X2) :-
+  removeLastPrev(Xa, Y, X1).
+
+checkWord([]).
+checkWord(Word,OLemma):-
+  removeLast(Word, RemovedLastList),
+  atom_chars(OLemma, RemovedLastList).
+
+lexi(Word,Stem) :- lemma(Word, _),Stem = Word,!;
+      atom_chars(Word, Listword),
+      checkWord(Listword, NewWord),
+      lexi(NewWord,Stem).
+
+% Lex for n
 lex(n(X^P),Lemma):-
-	lemma(Lemma,n),
-	P=.. [Lemma,X].
+  lexi(Lemma, Stem),
+	lemma(Stem,n),
+	P=.. [Stem,X].
 
-lex(dt((X^P)^(X^Q)^forall(X,imp(P,Q))),Word):-
-		lemma(Word,dtforall).
+% Lex for tv
+lex(tv(X^Y^P, []), Lemma):-
+  lexi(Lemma, Stem),
+	lemma(Stem,tv),
+  P=.. [Stem, X,Y].
+
+% Lex for iv
+lex(iv(X^P), Lemma):-
+  lexi(Lemma, Stem),
+	lemma(Stem,iv),
+	P=.. [Stem,X].
+
+% Lex for dt
+lex(dt((X^P)^(X^Q)^forall(X,imp(P,Q))),Word):- lemma(Word,dtforall).
+lex(dt((X^P)^(X^Q)^exists(X,imp(P,Q))),Word):- lemma(Word,dtexists).
+lex(dt((X^P)^(X^Q)^the(X,imp(P,Q))),Word):- lemma(Word,dtforthe).
+
+% Lex for adj
+lex(adj((X^P)^X^and(P,Q)), Lemma):-
+  lexi(Lemma, Stem),
+	lemma(Stem,adj),
+  Q=.. [Lemma, X].
+
+% Lex for pn
+lex(pn(P^X), Lemma):-
+  lexi(Lemma, Stem),
+	lemma(Stem,pn),
+	P= (Stem^X).
+
+% Lex for aux
+lex(aux, Lemma):-
+	lemma(Lemma, aux).
+
+% Lex for p
+lex(p((Y^Z)^Q^(X^P)^and(P,Q)), Lemma):-
+  lemma(Lemma, p),
+  Y=.. [Lemma, X].
+
+% Lex for who - Interogative Person
+lex(whpr((X^P)^exists(X,and(person(X),P))),Word):-
+  lemma(Word,whpr).
+
+% Lex for which - Interogative Thing
+lex(whth((X^P)^exists(X,and(thing(X),P))),Word):-
+  lemma(Word,whth).
+
+% Lex for Rel
+lex(rel(P^P),Word):-
+	lemma(Word,rel).
+
+% Other lex
+lex(pn((tom^X)^X),tom).
+lex(pn((sue^X)^X),sue).
+
+lex(n(X^bus(X)),bus).
+lex(n(X^weapon(X)),weapon).
+lex(n(X^passenger(X)),passenger).
+lex(n(X^man(X)),man).
+
+lex(adj((X^P)^X^and(P,blue(X))),blue).
+lex(adj((X^P)^X^and(P,old(X))),old).
+lex(adj((X^P)^X^and(P,illegal(X))),illegal).
+
+lex(iv(X^sneezed(X)),sneezed).
+lex(tv(X^Y^saw(X,Y)),saw).
+lex(tv(X^Y^have(X,Y)),had).
+
+lex(X,drank):-lex(X,drink).
+lex(X,drunk):-lex(X,drink).
 
 % ...
 
