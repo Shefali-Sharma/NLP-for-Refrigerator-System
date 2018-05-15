@@ -87,20 +87,126 @@ srparse(Stack,[Word|Words]):-
 % --------------------------------------------------------------------
 lemma(a,dtexists).
 lemma(an,dtexists).
+lemma(some,dtexists).
 lemma(each,dtforall).
 lemma(all,dtforall).
 lemma(every,dtforall).
-lemma(box,n).
+lemma(the,dtforthe).
+
+% this, these     %%
+
+
+% Proper noun
 lemma(tom,pn).
 lemma(mia,pn).
-lemma(red,adj).
+lemma(sue,pn).
+lemma(john,pn).
+
+% noun
+lemma(box, n).
+lemma(burger, n).
+lemma(container, n).
+lemma(ham, n).
+lemma(freezer, n).
+lemma(egg, n).
+lemma(bowl, n).
+lemma(shelf, n).
+lemma(sandwich, n).
+lemma(meat, n).
+lemma(banana, n).
+lemma(bowl, n).
+lemma(fridge, n).
+lemma(milk, n).
+lemma(book, n).
+
+% be
 lemma(is,be).
 lemma(was,be).
-lemma(eat,tv).
+lemma(are,be).
+
+% tv
+lemma(eat, tv).
+lemma(contain, tv).
+lemma(arrive, iv).
+lemma(belong, tv).
+lemma(inside, tv).
+lemma(put, tv).
+lemma(read, iv).
+
+% p
 lemma(in,p).
 lemma(under,p).
+% lemma(on,p).
+% lemma(to,p).
+% lemma(of,p).
+
+% vacp
 lemma(on,vacp).
-lemma(to,vacp).
+lemma(to,p).
+lemma(of,vacp).
+lemma(at,vacp).
+
+% aux
+lemma(can,aux).
+lemma(do, aux).
+lemma(does, aux).
+lemma(will, aux).
+lemma(did, aux).
+
+% whpr - Interogative Person
+lemma(who,whpr).
+lemma(whose,whpr).
+
+lemma(what,whpr).
+% lemma(what,what) %%
+
+% whth - Interogative Thing
+lemma(which,whth).
+
+% adj
+lemma(red,adj).
+lemma(two,adj).
+lemma(white,adj).
+lemma(blue,adj).
+lemma(green,adj).
+lemma(black,adj).
+lemma(orange,adj).
+lemma(red,adj).
+lemma(yellow,adj).
+lemma(top,adj).
+lemma(above,adj).
+lemma(middle,adj).
+lemma(bottom,adj).
+lemma(empty,adj).
+
+% rel
+lemma(that,rel).
+
+% ===========================================================
+%
+%lemma(that,wdt).  %Check
+lemma(has,be).  %Check
+lemma(no,dtfornone).  %Check
+lemma(what,what).
+% lemma(does,be).  %Check
+lemma(the,dtexists). %Check
+
+lemma(there,there).  %Check
+lemma(two,adj).  %Check
+lemma(watermelon,n).  %Check
+lemma(who,wh).
+lemma(almond,n).  %Check
+lemma(almond,adj).
+% lemma(drank,tv).
+lemma(which,whth).
+lemma(did,be).
+lemma(sam,pn).
+lemma(drink,tv).  %Check
+lemma(not,dtfornone).  %Check
+lemma(of,p).  %Check if it is vacp
+lemma(popsicle,n).  %Check
+lemma(popsicles,n).  %Check
+% ===========================================================
 
 
 % --------------------------------------------------------------------
