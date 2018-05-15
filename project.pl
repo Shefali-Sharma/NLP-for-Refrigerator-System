@@ -273,7 +273,7 @@ lex(aux, Lemma):-
 % Lex for p
 lex(p((Y^Z)^Q^(X^P)^and(P,Q)), Lemma):-
   lemma(Lemma, p),
-  Y=.. [Lemma, X].
+  Z=.. [Lemma, X].
 
 % Lex for who - Interogative Person
 lex(whpr((X^P)^exists(X,and(person(X),P))),Word):-
@@ -374,8 +374,11 @@ rule(rc(Y),[np(X^Y),rel,vp(X,[])]).
 %  3. If input is a content question, find answer
 % ===========================================================
 
+
 model([a,b,c,r],
-           [ [cat, [a,b]], q[dog,[c]], [die, [c,r,d]], [chase, [ [a,b], [c,a], [c,b] ]] ]).
+           [ [cat, [a,b]], [dog,[c]], [die, [c,r,d]], [chase, [ [a,b], [c,a], [c,b] ]] ]).
+
+
 
 % ==================================================
 % Function i
@@ -495,7 +498,6 @@ sat(G,Rel,G):-
    i(Var1,G,Value1),
    i(Var2,G,Value2),
    f(R,[Value1,Value2]).
-
 
 % ===========================================================
 %  Respond
