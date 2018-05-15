@@ -10,13 +10,13 @@
 chat:-
  repeat,
    readinput(Input),
-   process(Input), 
+   process(Input),
   (Input = [bye| _] ),!.
-  
+
 
 % ===========================================================
 % Read input:
-% 1. Read char string from keyboard. 
+% 1. Read char string from keyboard.
 % 2. Convert char string to atom char list.
 % 3. Convert char list to lower case.
 % 4. Tokenize (based on spaces).
@@ -41,7 +41,7 @@ process(Input):-
 	modelchecker(SemanticRepresentation,Evaluation),
 	respond(Evaluation),!,
 	nl,nl.
-	
+
 process([bye|_]):-
    write('> bye!').
 
@@ -55,7 +55,24 @@ process([bye|_]):-
 
 %parse(Input, SemanticRepresentation):-
 % ...
+sr_parse(Sentence):-
+        srparse([],Sentence).
 
+srparse([X],[]):-
+  numbervars(X,0,_),
+  write(X).
+
+srparse([Y,X|MoreStack],Words):-
+       rule(LHS,[X,Y]),
+       srparse([LHS|MoreStack],Words).
+
+srparse([X|MoreStack],Words):-
+       rule(LHS,[X]),
+       srparse([LHS|MoreStack],Words).
+
+srparse(Stack,[Word|Words]):-
+        lex(X,Word),
+        srparse([X|Stack],Words).
 
 % ===========================================================
 % Grammar
@@ -82,10 +99,10 @@ lemma(was,be).
 lemma(eat,tv).
 lemma(in,p).
 lemma(under,p).
-lemma(on,vacp).   
+lemma(on,vacp).
 lemma(to,vacp).
 
- 
+
 % --------------------------------------------------------------------
 % Constructing lexical items:
 % word = lemma + suffix (for "suffix" of size 0 or bigger)
@@ -98,7 +115,7 @@ lex(n(X^P),Lemma):-
 
 lex(dt((X^P)^(X^Q)^forall(X,imp(P,Q))),Word):-
 		lemma(Word,dtforall).
-				
+
 % ...
 
 % --------------------------------------------------------------------
@@ -133,28 +150,27 @@ rule(np(X),[pn(X)]).
 % ===========================================================
 
 % Declarative true in the model
-respond(Evaluation) :- 
-		Evaluation = [true_in_the_model], 
+respond(Evaluation) :-
+		Evaluation = [true_in_the_model],
 		write('That is correct'),!.
 
 % Declarative false in the model
-respond(Evaluation) :- 
-		Evaluation = [not_true_in_the_model],  
+respond(Evaluation) :-
+		Evaluation = [not_true_in_the_model],
 		write('That is not correct'),!.
 
 % Yes-No interrogative true in the model
-respond(Evaluation) :- 
-		Evaluation = [yes_to_question],			
+respond(Evaluation) :-
+		Evaluation = [yes_to_question],
 		write('yes').
 
-% Yes-No interrogative false in the model		
-respond(Evaluation) :- 
-		Evaluation = [no_to_question], 			
+% Yes-No interrogative false in the model
+respond(Evaluation) :-
+		Evaluation = [no_to_question],
 		write('no').
 
 % wh-interrogative true in the model
-% ...							
+% ...
 
 % wh-interrogative false in the model
-% ...							
-
+% ...
