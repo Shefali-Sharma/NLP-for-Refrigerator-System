@@ -55,6 +55,7 @@ process([bye|_]):-
 
 %parse(Input, SemanticRepresentation):-
 % ...
+
 sr_parse(Sentence):-
         srparse([],Sentence).
 
@@ -74,6 +75,7 @@ srparse(Stack,[Word|Words]):-
         lex(X,Word),
         srparse([X|Stack],Words).
 
+
 % ===========================================================
 % Grammar
 % 1. List of lemmas
@@ -85,6 +87,8 @@ srparse(Stack,[Word|Words]):-
 % Lemmas are uninflected, except for irregular inflection
 % lemma(+Lemma,+Category)
 % --------------------------------------------------------------------
+
+% determiners
 lemma(a,dtexists).
 lemma(an,dtexists).
 lemma(some,dtexists).
@@ -92,6 +96,7 @@ lemma(each,dtforall).
 lemma(all,dtforall).
 lemma(every,dtforall).
 lemma(the,dtforthe).
+lemma(no,dtfornone).
 
 % this, these     %%
 
@@ -118,11 +123,18 @@ lemma(bowl, n).
 lemma(fridge, n).
 lemma(milk, n).
 lemma(book, n).
+lemma(mango,n).
+lemma(watermelon,n).
+lemma(apple,n).
+lemma(chocolate,n).
+lemma(popsicle,n).
+lemma(bread,n).
 
 % be
 lemma(is,be).
 lemma(was,be).
 lemma(are,be).
+lemma(has,be).
 
 % tv
 lemma(eat, tv).
@@ -132,6 +144,7 @@ lemma(belong, tv).
 lemma(inside, tv).
 lemma(put, tv).
 lemma(read, iv).
+lemma(drink,tv).
 
 % p
 lemma(in,p).
@@ -145,6 +158,7 @@ lemma(on,vacp).
 lemma(to,p).
 lemma(of,vacp).
 lemma(at,vacp).
+lemma(inside,vacp).
 
 % aux
 lemma(can,aux).
@@ -152,6 +166,8 @@ lemma(do, aux).
 lemma(does, aux).
 lemma(will, aux).
 lemma(did, aux).
+lemma(are,aux).
+lemma(is,aux).
 
 % whpr - Interogative Person
 lemma(who,whpr).
@@ -161,7 +177,8 @@ lemma(what,whpr).
 % lemma(what,what) %%
 
 % whth - Interogative Thing
-lemma(which,whth).
+% lemma(which,whth).
+lemma(which,which).
 
 % adj
 lemma(red,adj).
@@ -178,36 +195,17 @@ lemma(above,adj).
 lemma(middle,adj).
 lemma(bottom,adj).
 lemma(empty,adj).
+lemma(almond,adj).
+lemma(two,adj).
 
 % rel
 lemma(that,rel).
 
-% ===========================================================
-%
-%lemma(that,wdt).  %Check
-lemma(has,be).  %Check
-lemma(no,dtfornone).  %Check
-lemma(what,what).
-% lemma(does,be).  %Check
-lemma(the,dtexists). %Check
+% neg
+lemma(not,neg).
 
-lemma(there,there).  %Check
-lemma(two,adj).  %Check
-lemma(watermelon,n).  %Check
-lemma(who,wh).
-lemma(almond,n).  %Check
-lemma(almond,adj).
-% lemma(drank,tv).
-lemma(which,whth).
-lemma(did,be).
-lemma(sam,pn).
-lemma(drink,tv).  %Check
-lemma(not,dtfornone).  %Check
-lemma(of,p).  %Check if it is vacp
-lemma(popsicle,n).  %Check
-lemma(popsicles,n).  %Check
-% ===========================================================
-
+% there
+lemma(there,there).
 
 % --------------------------------------------------------------------
 % Constructing lexical items:
@@ -238,7 +236,7 @@ lex(n(X^P),Lemma):-
 	P=.. [Stem,X].
 
 % Lex for tv
-lex(tv(X^Y^P, []), Lemma):-
+lex(tv(X^Y^P), Lemma):-
   lexi(Lemma, Stem),
 	lemma(Stem,tv),
   P=.. [Stem, X,Y].
