@@ -347,6 +347,10 @@ rule(vp(X),[iv(X)]).
 % VP -> AUX VERB
 rule(vp(X),[aux(X)]).   %%
 
+% VP -> AUX VP
+rule(vp(X^Y,[]),[aux(_),vp(X^Y,[])]).
+% rule(vp(X^Y),[aux(X),vp(X^Y)]).
+
 % S -> NP VP
 rule(s(Y),[np(X^Y),vp(X)]).
 
