@@ -320,8 +320,49 @@ lex(X,drunk):-lex(X,drink).
 % rule(+LHS,+ListOfRHS)
 % --------------------------------------------------------------------
 
-rule(np(Y),[dt(X^Y),n(X)]).
+% NP -> PN
 rule(np(X),[pn(X)]).
+
+% NP -> N
+rule(np(X),[n(X)]).
+
+% S -> NP VP
+rule(s(Y),[np(X^Y),vp(X)]).
+
+% VP -> TV NP
+rule(vp(X^W),[tv(X^Y),np(Y^W)]).
+
+% VP -> IV      % rule()
+rule(vp(X),[iv(X)]).
+
+% VP -> AUX VERB
+rule(vp(X),[aux(X)]).   %%
+
+% Questions
+rule(ynq(Y),[aux, np(X^Y),vp(X,[])]).
+
+rule(Y,[whpr(X^Y),vp(X,[])]).
+rule(Z,[whpr((X^Y)^Z), inv_s(Y,[X])]).
+rule(inv_s(Y,[WH]),[aux, np(X^Y),vp(X,[WH])]).
+
+% NP -> DT N
+rule(np(Y),[dt(X^Y),n(X)]).
+
+% N -> ADJ N
+rule(n(Y),[adj(X^Y),n(X)]).
+
+% N -> N PP
+rule(n(X^Z),[n(X^Y),pp((X^Y)^Z)]).
+
+% N -> N RC
+rule(n(X^Z),[n(X^Y),rc((X^Y)^Z)]).    %%
+
+% PP -> P NP
+rule(pp(Z),[p(X^Y^Z),np(X^Y)]).
+
+% RC -> NP REL VP                      %%
+rule(rc(Y),[np(X^Y),rel,vp(X,[])]).
+
 
 % ...
 
