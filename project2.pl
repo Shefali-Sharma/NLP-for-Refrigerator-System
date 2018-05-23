@@ -74,7 +74,6 @@ srparse(Stack,[Word|Words],Parse):-
         lex(X,Word),
         srparse([X|Stack],Words,Parse).
 
-
 % ===========================================================
 % Grammar
 % 1. List of lemmas
@@ -86,7 +85,6 @@ srparse(Stack,[Word|Words],Parse):-
 % Lemmas are uninflected, except for irregular inflection
 % lemma(+Lemma,+Category)
 % --------------------------------------------------------------------
-
 % determiners
 lemma(a,dtexists).
 lemma(an,dtexists).
@@ -206,10 +204,8 @@ lemma(not,neg).
 % there
 lemma(there,there).
 
-% --------------------------------------------------------------------
-% Constructing lexical items:
-% word = lemma + suffix (for "suffix" of size 0 or bigger)
-% --------------------------------------------------------------------
+
+
 
 removeLast([X|Xa], Y) :-
   removeLastPrev(Xa, Y, X).
@@ -222,6 +218,16 @@ checkWord([]).
 checkWord(Word,OLemma):-
   removeLast(Word, RemovedLastList),
   atom_chars(OLemma, RemovedLastList).
+
+
+% --------------------------------------------------------------------
+% Constructing lexical items:
+% word = lemma + suffix (for "suffix" of size 0 or bigger)
+% --------------------------------------------------------------------
+
+
+
+% --------------------------------------------------------------------
 
 lexi(Word,Stem) :- lemma(Word, _),Stem = Word,!;
       atom_chars(Word, Listword),
@@ -237,7 +243,7 @@ lex(n(X^P),Lemma):-
 % Lex for tv
 lex(tv(X^Y^P,[]), Lemma):-
   lexi(Lemma, Stem),
-  lemma(Stem,tv),
+	lemma(Stem,tv),
   P=.. [Stem, X,Y].
 
 % Lex for iv
@@ -248,21 +254,22 @@ lex(iv(X^P), Lemma):-
 
 % Lex for dt
 lex(dt((X^P)^(X^Q)^forall(X,imp(P,Q))),Word):- lemma(Word,dtforall).
+lex(dt((X^P)^(X^Q)^exists(X,(and(P,Q)))),a).
 lex(dt((X^P)^(X^Q)^exists(X,imp(P,Q))),Word):- lemma(Word,dtexists).
-lex(dt((X^P)^(X^Q)^the(X,imp(P,Q))),Word):- lemma(Word,dtforthe).
+lex(dt((X^P)^(X^Q)^exists(X,imp(P,Q))),Word):- lemma(Word,dtforthe).
 
 % Lex for adj
 lex(adj((X^P)^X^and(P,Q)), Lemma):-
   lexi(Lemma, Stem),
 	lemma(Stem,adj),
-  Q=.. [Lemma, X].
+  Q=.. [Stem, X].
 
 % Lex for pn
 lex(pn(P^X), Lemma):-
   lexi(Lemma, Stem),
 	lemma(Stem,pn),
 	P= (Stem^X).
-
+\
 % Lex for aux
 lex(aux, Lemma):-
 	lemma(Lemma, aux).
@@ -273,25 +280,18 @@ lex(p((Y^Z)^Q^(X^P)^and(P,Q)), Lemma):-
   Z=.. [Lemma, X].
 
 % Lex for who - Interogative Person
-lex(whpr((X^P)^exists(X,and(person(X),P))),Word):-
+lex(whpr((X^P)^q(X,and(person(X),P))),Word):-
   lemma(Word,whpr).
 
 % Lex for which - Interogative Thing
-lex(whth((X^P)^exists(X,and(thing(X),P))),Word):-
+lex(whth((X^P)^q(X,and(thing(X),P))),Word):-
   lemma(Word,whth).
 
 % Lex for Rel
 lex(rel(P^P),Word):-
 	lemma(Word,rel).
 
-% Lex for there
-lex(X,Lemma):-
-  	lemma(Lemma,there),
-    X = [].
 
-% Lex for VACP
-lex(vacp((Y^in(X,Y))^Q^(X^P)^and(P,Q)),Word):-
-                    lemma(Word,vacp).
 % Other lex
 lex(pn((tom^X)^X),tom).
 lex(pn((sue^X)^X),sue).
@@ -306,12 +306,55 @@ lex(adj((X^P)^X^and(P,old(X))),old).
 lex(adj((X^P)^X^and(P,illegal(X))),illegal).
 
 lex(iv(X^sneezed(X)),sneezed).
-lex(tv(X^Y^saw(X,Y)),saw).
-lex(tv(X^Y^have(X,Y)),had).
+lex(tv(X^Y^saw(X,Y),[]),saw).
+lex(tv(X^Y^have(X,Y,[])),had).
 
 lex(X,drank):-lex(X,drink).
 lex(X,drunk):-lex(X,drink).
-% ...
+
+% ...+++++++++++++++++++++++++++++++++++++++++++++
+
+lex(not(P^P),Word):-
+	lemma(Word,neg).
+
+lex(rel(P^P),Word):-
+	lemma(Word,rel).
+
+lex(whth((X^P)^exists(X,and(thing(X),P))),Word):-
+	lemma(Word,whth).
+
+% lex(what((X^P)^(X^Q)^exists(X,and(P,Q)),[X]),Word):-
+	% lemma(Word,what).
+
+lex(ve(P^P),Word):-
+	lemma(Word,be).
+
+lex(vacp(P^P),Word):-
+	lemma(Word,vacp).
+
+lex(there(P^P),Word):-
+	lemma(Word,[]).
+
+lex(aux,Lemma):-
+	lemma(Lemma,aux).
+
+lex(vacp((Y^in(X,Y))^Q^(X^P)^and(P,Q)),Word):-
+                lemma(Word,vacp).
+
+lex(dt((X^P)^(X^Q)^not(exists(X,P^Q))),Word):-
+                lemma(Word,dtfornone).
+
+lex(whth((X^P)^exists(X,and(thing(X),P))),Word):-
+  lemma(Word,whth).
+
+lex(whpr((X^P)^q(X,and(person(X),P))),Word):-
+  lemma(Word,whpr).
+
+lex(rel(P^P),Word):-
+	lemma(Word,rel).
+
+lex(rel(P^P),Word):-
+	lemma(Word,rel).
 
 % --------------------------------------------------------------------
 % Suffix types
@@ -324,51 +367,58 @@ lex(X,drunk):-lex(X,drink).
 % rule(+LHS,+ListOfRHS)
 % --------------------------------------------------------------------
 
-% N -> ADJ N
-rule(n(Y),[adj(X^Y),n(X)]).
-
-% N -> N PP
-rule(n(X^Z),[n(X^Y),pp((X^Y)^Z)]).
-
-% N -> N RC
-rule(n(X^Z),[n(X^Y),rc((X^Y)^Z)]).    %%
-rule(n(X^and(Y,Z)),[n(X^Y),rc(Z,[X])]).
-
-% NP -> PN
-rule(np(X),[pn(X)]).
-
-% NP -> N
-rule(np(X),[n(X)]).
-
-% NP -> DT N
-rule(np(Y),[dt(X^Y),n(X)]).
-
-% VP -> TV NP
-rule(vp(X^W),[tv(X^Y),np(Y^W)]).
-
-% VP -> IV      % rule()
-rule(vp(X),[iv(X)]).
-
-% VP -> AUX VERB
-rule(vp(X),[aux(X)]).   %%
-
-% VP -> AUX VP
-rule(vp(X^Y,[]),[aux(_),vp(X^Y,[])]).
-% rule(vp(X^Y),[aux(X),vp(X^Y)]).
-
-% S -> NP VP
-rule(s(Y),[np(X^Y),vp(X)]).
+rule(s(B),[np(A^B),vp(A)]).
 rule(s(Y,WH),[np(X^Y),vp(X,WH)]). % original
 rule(s(Y), [np(Y),vp(Y)]). %%%%
 rule(s(X,[WH]),[vp(X,[WH])]).
 
-% Questions
-rule(ynq(Y),[aux, np(X^Y),vp(X,[])]).
-rule(q(X),[whpr((X^P)^exists(X,and(person(X),P)))]).
+% S -> NP VP
+rule(s(Y),[np(X^Y),vp(X)]).
+% NP -> PN
+rule(np(X),[pn(X)]).
+% NP -> N
+% rule(np(A),[n(A^C)]).
 
-rule(Y,[whpr(X^Y),vp(X,[])]).
-rule(Z,[whpr((X^Y)^Z), inv_s(Y,[X])]).
-rule(inv_s(Y,[WH]),[aux, np(X^Y),vp(X,[WH])]).
+rule(np(X),[n(X)]).
+% NP -> DT N
+rule(np(Y),[dt(X^Y),n(X)]).
+% N -> ADJ N
+rule(n(Y),[adj(X^Y),n(X)]).
+% N -> N PP
+rule(n(X^Z),[n(X^Y),pp((X^Y)^Z)]).
+
+
+
+
+rule(vp(X^Y,[]),[aux(_),vp(X^Y,[])]).
+% rule(vp(X^not(Y),[]),[not(_),vp(X^Y,[])]).
+% VP -> TV NP
+% rule(vp(X^W),[tv(X^Y),np(Y^W)]).
+rule(vp(A^D,[]),[tv(A^C^D,[]),np(C^B)]).
+
+% VP -> IV      % rule()
+rule(vp(X),[iv(X)]).
+% VP -> AUX VERB
+% rule(vp(X),[aux(X)]).   %%
+
+
+
+% S -> Aux NP VP
+% S -> VP
+% S -> Wh-NP VP          : Which, What, Whose
+% S -> Wh-NP Aux NP VP
+% S -> BE NP AP
+% S -> BE NP PP
+% S -> BE NP NP
+% RC -> NP REL VP
+
+
+
+
+
+
+% N -> N RC
+% rule(n(X^Z),[n(X^Y),rc((X^Y)^Z)]).    %%
 
 % PP -> P NP
 rule(pp(Z),[p(X^Y^Z),np(X^Y)]).
@@ -376,9 +426,61 @@ rule(pp(Z),[p(X^Y^Z),np(X^Y)]).
 % RC -> NP REL VP                      %%
 rule(rc(Y),[np(X^Y),rel,vp(X,[])]).
 
-% RC -> REL RS
-rule(rc(P,[K]),[rel(_),rs(P,[K])]).
+% VP -> TV WHPR
+% rule(vp(X^W),[whpr((X^Y)^W),tv(X^Y)]).
+
+rule(Y,[whpr(X^Y),vp(X,[])]).
+
+% rule(q(A),[exists(A,and(person(A),saw(A,tom))),who()]).
+% rule(q(X),[whpr((X^P)^exists(X,and(person(X),P)))]).
+
+% change
+
+rule(vp(A^D,[]),[tv(A^C^D,[]),np(C^B)]).
+
+% lex(A,who), lex(B,saw), lex(C,tom), rule(D,[A,B]), rule(E,[C])., rule(F,[D,E]).
+% D = vp(A^exists(A, and(person(A), B^saw(A, B))))
+rule(iv(X,[Y]),[tv(X^Y,[])]).
+rule(ynq(Y),[aux, np(X^Y),vp(X,[])]).
+rule(Z,[whpr((X^Y)^Z), inv_s(Y,[X])]).
+rule(inv_s(Y,[WH]),[aux, np(X^Y),vp(X,[WH])]).
+
+
+% A = dt((_10246^ham(_10246))^(_10246^_10260)^exists(_10246, imp(ham(_10246), _10260))),
+% B = n(_10246^ham(_10246)),
+% L = [dt((_10246^ham(_10246))^(_10246^_10260)^exists(_10246, imp(ham(_10246), _10260))), n(_10246^ham(_10246))],
+% X = np((_10246^_10260)^exists(_10246, imp(ham(_10246), _10260))) ;
+
+% rule(np((X^some)^exists(X, imp(P, some))), [dt((P)^(X^some)^exists(X, imp(P, some))), n(P)]).
+% rule(np((_10246^_10260)^exists(_10246, imp(ham(_10246), _10260))), n(P)).
+
+% rule(np(X^Y),[lex(Y,some),n(X)]).
+
+% rule(np(Y),[tv(X^Y),lex(Y,some),n(X)]).
+% ?- sr_parse([ham]).
+% n(A^ham(A))
+% true .
+
+% ?- sr_parse([some, ham]).
+% np((A^B)^exists(A,imp(ham(A),B)))
+% true .
+
+% ?- sr_parse([some]).
+% dt((A^B)^(A^C)^exists(A,imp(B,C)))
+
+% S -> VP
+% rule(s(X,[wh]),[vp(X,[wh])]).
+
+ %rule(np(X),[n(X)]).  :- lex(A,some).
+%rule(np(A),lex(dt((X^P)^(X^Q)^exists(X,imp(P,Q))),Some), n(B)).
+% rule(np(Y),[X^some(Y),n(X)]).
 % ...
+
+rule(rs(Y,[WH]),[np(X^Y),vp(X,[WH])]).
+rule(rc(X^Y,[]),[rel(_),vp(X^Y,[])]).
+rule(rc(P,[K]),[rel(_),rs(P,[K])]).
+rule(n(X^and(Y,Z)),[n(X^Y),rc(X^Z,[])]).
+rule(n(X^and(Y,Z)),[n(X^Y),rc(Z,[X])]).
 
 
 % ===========================================================
@@ -389,129 +491,6 @@ rule(rc(P,[K]),[rel(_),rs(P,[K])]).
 % ===========================================================
 
 
-model([a,b,c,r],
-           [ [cat, [a,b]], [dog,[c]], [die, [c,r,d]], [chase, [ [a,b], [c,a], [c,b] ]] ]).
-
-
-
-% ==================================================
-% Function i
-% Determines the value of a variable/constant in an assignment G
-% ==================================================
-
-i(Var,G,Value):-
-    var(Var),
-    member([Var2,Value],G),
-    Var == Var2.
-
-i(C,_,Value):-
-   nonvar(C),
-   f(C,Value).
-
-
-% ==================================================
-% Function F
-% Determines if a value is in the denotation of a Predicate/Relation
-% ==================================================
-
-f(Symbol,Value):-
-   model(_,F),
-    member([Symbol,ListOfValues],F),
-    member(Value,ListOfValues).
-
-
-% ==================================================
-% Extension of a variable assignment
-% ==================================================
-
-extend(G,X,[ [X,Val] | G]):-
-   model(D,_),
-   member(Val,D).
-
-
-% ==================================================
-% Existential quantifier
-% ==================================================
-
-sat(G1,exists(X,Formula),G3):-
-   extend(G1,X,G2),
-   sat(G2,Formula,G3).
-
-
-% ==================================================
-% Definite quantifier (semantic rather than pragmatic account)
-% ==================================================
-
- sat(G1,the(X,and(A,B)),G3):-
-   sat(G1,exists(X,and(A,B)),G3),
-   i(X,G3,Value),
-   \+ ( ( sat(G1,exists(X,A),G2), i(X,G2,Value2), \+(Value = Value2)) ).
-
-
-
-
-% ==================================================
-% Negation
-% ==================================================
-
-sat(G,not(Formula2),G):-
-   \+ sat(G,Formula2,_).
-
-% ==================================================
-% Universal quantifier
-% ==================================================
-
-sat(G, forall(X,Formula2),G):-
-  sat(G,not( exists(X,not(Formula2) ) ),G).
-
-
-% ==================================================
-% Conjunction
-% ==================================================
-
-sat(G1,and(Formula1,Formula2),G3):-
-  sat(G1,Formula1,G2),
-  sat(G2,Formula2,G3).
-
-
-% ==================================================
-% Disjunction
-% ==================================================
-
-
-sat(G1,or(Formula1,Formula2),G2):-
-  ( sat(G1,Formula1,G2) ;
-    sat(G1,Formula2,G2) ).
-
-
-% ==================================================
-% Implication
-% ==================================================
-
-sat(G1,imp(Formula1,Formula2),G2):-
-   sat(G1,or(not(Formula1),Formula2),G2).
-
-
-% ==================================================
-% Predicates
-% ==================================================
-
-sat(G,Predicate,G):-
-   Predicate =.. [P,Var],
-   \+ (P = not),
-   i(Var,G,Value),
-   f(P,Value).
-
-% ==================================================
-% Two-place Relations
-% ==================================================
-
-sat(G,Rel,G):-
-   Rel =.. [R,Var1,Var2],
-   \+ ( member(R,[exists,forall,and,or,imp,the]) ),
-   i(Var1,G,Value1),
-   i(Var2,G,Value2),
-   f(R,[Value1,Value2]).
 
 % ===========================================================
 %  Respond
